@@ -1,17 +1,35 @@
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework import status
+from .serializers import RegisterProfileSerializer, ProfileSerializer
+from django.contrib.auth.models import User
 
 
 @api_view(['POST'])
-def register_user(request: Request):
-    fnm = request.data.get('first_name')
-    lnm = request.data.get('last_name')
-    ph = request.data.get('phone')
-    age = request.data.get('age')
-    gen = request.data.get('gender')
+def register_user(request):
+    # 1️⃣ Login details (User table)
+    username = request.data.get("username")
+    password = request.data.get("password")
 
+    if not username or not password:
+        return Response({"error": "username and password are required"},status=400)
+
+    if User.objects.filter(username=username).exists():
+        return Response({"error": "username already exists"},status=400)
+
+    # 2️⃣ Create USER (auth)
+    user = User.objects.create_user(username=username,password=password)
+
+    # 3️⃣ Create PROFILE (personal info)
+    serializer = RegisterProfileSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save(user=user)
+        return Response({"message": "User registered successfully"},status=201)
+
+    # 4️⃣ If profile validation fails → rollback user
+    user.delete()
+    return Response(serializer.errors, status=400)
 
 
 @api_view(['POST'])
