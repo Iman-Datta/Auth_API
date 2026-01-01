@@ -1,15 +1,17 @@
 from rest_framework.decorators import api_view
+from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework import status
 
 
 @api_view(['POST'])
-def register_user(request):
-    """
-    Register a new user
-    - create User
-    - create Profile
-    """
-    pass
+def register_user(request: Request):
+    fnm = request.data.get('first_name')
+    lnm = request.data.get('last_name')
+    ph = request.data.get('phone')
+    age = request.data.get('age')
+    gen = request.data.get('gender')
+
 
 
 @api_view(['POST'])
