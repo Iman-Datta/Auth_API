@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .serializers import RegisterProfileSerializer, ProfileSerializer
 from django.contrib.auth.models import User
 from .models import Profile
+from rest_framework import status
 
 
 @api_view(['POST'])
@@ -29,7 +30,6 @@ def register_user(request: Request):
     user.delete()
     return Response(serializer.errors, status=400)
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_profile(request: Request):
@@ -52,12 +52,6 @@ def update_profile(request: Request):
         return Response(serializer.errors, status=400)
     except Profile.DoesNotExist:
         return Response({"error": "Profile not found"}, status=404)
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -87,12 +81,3 @@ def change_password(request):
         {"message": "Password changed successfully"},
         status=status.HTTP_200_OK
     )
-
-
-
-@api_view(['POST'])
-def logout_user(request):
-    """
-    Logout user (JWT blacklist later)
-    """
-    pass
